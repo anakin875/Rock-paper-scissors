@@ -1,80 +1,89 @@
-/* do{
-    playerSelection = prompt("Please choose rock, paper or scissors")
-    playerSelection = playerSelection.toLowerCase()
-    computerSelection = getComputerChoice()
-    gameRound(playerSelection, computerSelection)
-
-    playAgain = prompt("Want to play again?(y/n):").toLowerCase()
-}while(playAgain == "y") */
 let playerWins = 0
 let computerWins = 0
 const resultsTable = document.querySelector('#results')
 const scoreBoard = document.querySelector('#scoreboard')
-
-const resultDiv = document.createElement('div')
-/* const playerScore = document.createElement('div')
-const computerScore = document.createElement('div') */
-
+const container = document.querySelector('#body')
 const selection = document.querySelectorAll("button")
+const lastButton = document.getElementById("break")
 
 selection.forEach((button) => {
-        button.addEventListener('click', () =>{
+    button.addEventListener('click', () =>{
             let playerSelection = button.value
-            gameRound(playerSelection)
-        })
-    }
-)
-
+            gameRound(playerSelection, playerWins, computerWins)
+    })
+})
 
 function getComputerChoice(){
     let num = Math.floor(Math.random()*3)
     switch(num){
         case 0:
-            computerSelection = "rock"
+            computerSelection = "Rock"
             break
         case 1:
-            computerSelection = "paper"
+            computerSelection = "Paper"
             break
         case 2:
-            computerSelection = "scissors"
+            computerSelection = "Scissors"
             break 
     }
     return computerSelection
 }
 
-function gameRound(playerSelection){
+
+//LO QUE PASA AQUI ESQ PLAYERWINS Y COMPUTERWINS SOLO SE ACTUALIZAN DE FORMA LOCAL EN LA FUNCION
+//TENGO QUE DEVOLVERLOS AFUERA DE LA FUNCION PARA QUE SE ACTUALICEN DE FORMA GLOBAL
+function gameRound(p1, scoreA, scoreB){
     let computerSelection = getComputerChoice()
 
-    if(playerSelection == computerSelection){
-        document.getElementById("results").textContent = `${playerSelection} vs ${computerSelection}, it's a tie!`
+    if(p1 == computerSelection){
+        document.getElementById("results").textContent = `${p1} vs ${computerSelection}, it's a tie!`
     }
-    else if(playerSelection == "rock" && computerSelection == "paper" ||
-            playerSelection == "paper" && computerSelection == "scissors" ||
-            playerSelection == "scissors" && computerSelection == "rock"){
+    else if(p1 == "Rock" && computerSelection == "Paper" ||
+            p1 == "Paper" && computerSelection == "Scissors" ||
+            p1 == "Scissors" && computerSelection == "Rock"){
 
-        document.getElementById("results").textContent = `${playerSelection} vs ${computerSelection}, you lose!`
-        computerWins++
-        document.getElementById("computerScore").textContent = `Computer: ${computerWins}`
+        scoreB++
+        computerWins = scoreB
+        document.getElementById("results").textContent = `${p1} vs ${computerSelection}, you lose!`
+        document.getElementById("computerScore").textContent = `Computer: ${scoreB}`
     }
-    else if(playerSelection == "rock" && computerSelection == "scissors" ||
-            playerSelection == "paper" && computerSelection == "rock" ||
-            playerSelection == "scissors" && computerSelection == "paper"){
+    else if(p1 == "Rock" && computerSelection == "Scissors" ||
+            p1 == "Paper" && computerSelection == "Rock" ||
+            p1 == "Scissors" && computerSelection == "Paper"){
 
-        document.getElementById("results").textContent = `${playerSelection} vs ${computerSelection}, you win!`
-        playerWins++
-        document.getElementById("playerScore").textContent = `Player: ${playerWins}`
+        scoreA++
+        playerWins = scoreA
+        document.getElementById("results").textContent = `${p1} vs ${computerSelection}, you win!`
+        document.getElementById("playerScore").textContent = `Player: ${scoreA}`
     }
 
-    if(playerWins == 5){
-        document.getElementById("results").textContent = "Player beats computer!"
-        selection.forEach((button) => {
-            button.disabled = true
-        })
-    }
-    if(computerWins == 5){
-        document.getElementById("results").textContent = "You got beaten by a computer!"
-        selection.forEach((button) => {
-            button.disabled = true
-        })
-    }
+    if(scoreA == 5 || scoreB == 5) replayGame(scoreA, scoreB)
+
 }
+
+function replayGame(scoreA, scoreB){
+    if(scoreA == 5) document.getElementById("results").textContent = "Player beats computer!"
+
+    if(scoreB == 5) document.getElementById("results").textContent = "You got beaten by a computer!"
+
+    selection.forEach((button) => {
+        button.disabled = true
+    })
+    const playAgain = document.createElement('button')
+    playAgain.classList.add('replay')
+    playAgain.textContent = 'Play Again'
+    container.appendChild(playAgain)
+    playAgain.addEventListener('click', () =>{
+        playerWins = 0
+        computerWins = 0
+        document.getElementById("playerScore").textContent = `Player: ${playerWins}`
+        document.getElementById("computerScore").textContent = `Computer: ${computerWins}`
+        selection.forEach((button) => {
+            button.disabled = false
+        })
+        playAgain.remove()
+    })
+
+}
+
+
